@@ -1,6 +1,7 @@
 venv
-models
+/models
 .idea
 
 __pycache__
 data
+.cache
