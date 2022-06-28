@@ -1,0 +1,9 @@
+jupyter
+matplotlib
+tensorflow
+tensorboard
+tensorflow_addons
+joblib
+numpy
+tensorboard_plugin_profile
+scipy
