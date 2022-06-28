@@ -36,10 +36,6 @@ class ModelConfig(BaseConfigModel):
     activation_function: str = "relu"
     final_activation_function: str = "relu"
 
-    double_conv: bool = False
-    unfolded_intermediate_output_loss: bool = False
-
-    normalization_layer: str = "instance_normalization"
     mu: float = 1
     n_iterations: Optional[int] = None
     input_shape: Tuple[int, int] = None
