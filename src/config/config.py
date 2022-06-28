@@ -1,7 +1,7 @@
-from typing import List, Optional, Dict, Tuple, Union
+from typing import List, Optional, Tuple
 from pathlib import Path
 from pydantic import BaseModel
-
+import tensorflow as tf
 import definitions
 
 
@@ -11,17 +11,14 @@ class BaseConfigModel(BaseModel):
 
 
 class DatasetConfig(BaseConfigModel):
-    name: str
     shot_no: int
     batch_size: int = 32
-    shuffle_buffer: int = 1000
-    data_scaling: str = "zero_one"
     noise: dict = {}
     copy_input_to_output: bool = False
 
     @property
     def path(self) -> Path:
-        return Path("processed") / "mantis" / self.name / str(self.shot_no)
+        return Path("processed") / "mantis" / str(self.shot_no)
 
     @property
     def full_path(self) -> Path:
@@ -43,8 +40,15 @@ class ModelConfig(BaseConfigModel):
     unfolded_intermediate_output_loss: bool = False
 
     normalization_layer: str = "instance_normalization"
+    mu: float = 1
+    n_iterations: Optional[int] = None
+    input_shape: Tuple[int, int] = None
+    output_shape: Tuple[int, int] = None
 
-    n_iterations_unfolding: int = 5
+    def set_shape_from_ds(self, dataset: tf.data.Dataset):
+        sample_image, sample_inversion = dataset.__iter__().next()
+        self.input_shape = (sample_image.shape[1], sample_image.shape[2])
+        self.output_shape = (sample_inversion.shape[1], sample_inversion.shape[2])
 
 
 class TrainingConfig(BaseConfigModel):
@@ -53,14 +57,9 @@ class TrainingConfig(BaseConfigModel):
     optimizer_params: dict = {}
     loss_function: str = "mse"
     cycle_loss: bool = False
-    loss_weights: Optional[Union[List[float], Dict[str, float]]] = None
-    additional_callbacks: List[Tuple[str, Dict]] = []
-    staged_training: bool = False
-    staged_epochs_per_unfold: List[int] = []
 
 
 class Config(BaseConfigModel):
-    project: str
     dataset: DatasetConfig
     model: ModelConfig
     training: TrainingConfig = TrainingConfig()
