@@ -9,3 +9,4 @@ tensorboard_plugin_profile
 scipy
 typer
 pyyaml
+pydantic
