@@ -10,3 +10,4 @@ scipy
 typer
 pyyaml
 pydantic
+tqdm
