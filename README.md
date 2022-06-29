@@ -30,3 +30,5 @@ or when using a different configuration file use
 ```shell
 python cli.py train {your_configuration_file.yaml}
 ```
+
+You can find the inversion grid and the geometry matrix for shot number 65903 on [this google drive](https://drive.google.com/drive/folders/1hxuSuCPjPOhwNOfia9q8m1M7VJkKuTa1?usp=sharing).
