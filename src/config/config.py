@@ -13,8 +13,6 @@ class BaseConfigModel(BaseModel):
 class DatasetConfig(BaseConfigModel):
     shot_no: int
     batch_size: int = 32
-    noise: dict = {}
-    copy_input_to_output: bool = False
 
     @property
     def path(self) -> Path:

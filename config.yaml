@@ -1,0 +1,8 @@
+model:
+  name: unet sirt
+  shot_no: 65903
+dataset:
+  shot_no: 65903
+  batch_size: 2
+training:
+  epochs: 1

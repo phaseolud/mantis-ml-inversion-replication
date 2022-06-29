@@ -7,8 +7,10 @@ from src.models.load import load_model, compile_model
 
 
 def train_from_config(config: Config):
-    log_dir = definitions.ROOT_DIR / "logs" / datetime.datetime.now().strftime("%Y%m%d-%H%M")
-    models_checkpoint_dir = definitions.ROOT_DIR / "models" / datetime.datetime.now().strftime("%Y%m%d-%H%M")
+    time_str = datetime.datetime.now().strftime("%Y%m%d-%H%M")
+
+    log_dir = definitions.ROOT_DIR / "logs" / time_str
+    models_checkpoint_path = definitions.ROOT_DIR / "models" / time_str / time_str
 
     train_ds, val_ds, _ = load_datasets(config.dataset)
     config.model.set_shape_from_ds(train_ds)
@@ -16,5 +18,5 @@ def train_from_config(config: Config):
     model = compile_model(model, config.training)
 
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
-    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(models_checkpoint_dir, save_weights_only=True, save_best_only=True)
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(models_checkpoint_path, save_weights_only=True, save_best_only=True)
     model.fit(train_ds, epochs=config.training.epochs, validation_data=val_ds, callbacks=[tensorboard_callback, model_checkpoint_callback])
