@@ -22,6 +22,13 @@ class BatchSparseDenseMatmul(tf.keras.layers.Layer):
     def call(self, x_batched):
         return tf.map_fn(self.inner_matmul, x_batched)
 
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            'M shape': self.M.shape
+        })
+        return config
+
 
 def sparse_scipy_matrix_to_tf(sparse_matrix):
     sparse_matrix_coo = sparse_matrix.astype(np.float32).tocoo()

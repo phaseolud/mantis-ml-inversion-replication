@@ -41,6 +41,14 @@ class ModelConfig(BaseConfigModel):
     input_shape: Tuple[int, int] = None
     output_shape: Tuple[int, int] = None
 
+    @property
+    def input_shape_ext(self) -> Tuple[int, int, int]:
+        return self.input_shape + (1,)
+
+    @property
+    def output_shape_ext(self) -> Tuple[int, int, int]:
+        return self.output_shape + (1,)
+
     def set_shape_from_ds(self, dataset: tf.data.Dataset):
         sample_image, sample_inversion = dataset.__iter__().next()
         self.input_shape = (sample_image.shape[1], sample_image.shape[2])

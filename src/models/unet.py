@@ -72,7 +72,7 @@ class Encoder(tf.keras.layers.Layer):
         skips = []
         for e_block in self.encoder_blocks:
             x, skip = e_block(x)
-            skips.append(x)
+            skips.append(skip)
         return x, skips
 
     def get_config(self):
