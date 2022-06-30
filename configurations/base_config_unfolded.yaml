@@ -1,0 +1,12 @@
+model:
+  name: unfolded proximal sirt
+  shot_no: 65903
+  decoder_filters: [ 32, 16, 8, 8 ]
+  encoder_filters: [ 8, 8, 16, 32 ]
+  bottleneck_filters: [ 32 ]
+  n_iterations: 5
+dataset:
+  shot_no: 65903
+  batch_size: 8
+training:
+  epochs: 40
