@@ -25,6 +25,9 @@ def evaluate_inference_time(model: tf.keras.models.Model, dataset: tf.data.Datas
     model.predict(dataset.repeat(), steps=50)
     tf.profiler.experimental.stop()
 
+    print("You can find the timing results of this model by using the following command from the root project directory:\n",
+          f"tensorboard --logdir=logs/{model_id}/profile")
+
 
 def load_model_and_config_from_id(model_id: str) -> (tf.keras.models.Model, Config):
     """
