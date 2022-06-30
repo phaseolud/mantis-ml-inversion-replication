@@ -43,9 +43,19 @@ You can evaluate the MSE and MAE of a trained model as:
 ```shell
 python cli.py evaluate {training/model_id}
 ```
-where the `{training/model_id}` can be found in the `logs` or `models` folder, being a datetime string.
+where the `{training/model_id}` can be found in the `logs` or `models` folder, being a datetime string. The training of 
+the informed U-net is generally stable and easily reproducible. The training of the unfolded network generally isn't 
+and multiple runs might be needed to get a satisfactory result.
+
 You can analyse the inference time by starting tensorboard in `logs/{model_id}/profile` and then selecting
-the Profile tab in the top bar.
+the Profile tab in the top bar:
+```shell
+tensorboard --logdir=logs/{model_id}/profile
+```
+<p align="middle">
+    <img align="top" alt="Tensorboard select profile" src="readme_files/tensorboard_profiler.png" width="49%"/>
+    <img align="top" alt="Tensorboard profiler example" src="readme_files/tb_profile_example.png" width="49%"/>
+</p>
 
 [//]: # (We can get the same metrics for the SIRT algorithm as)
 
