@@ -25,13 +25,13 @@ def build_classical_iterative_model(model_config: ModelConfig, F_x: tf.Tensor, F
 
 
 def build_sirt_model(model_config: ModelConfig):
-    mu = tf.Variable(model_config.mu)
+    mu = tf.Variable(model_config.mu, dtype=tf.float32)
     F_x, F_y = create_sirt_variables_tf(model_config.shot_no)
     return build_classical_iterative_model(model_config, mu * F_x, mu * F_y)
 
 
 def build_gd_model(model_config: ModelConfig):
-    mu = tf.Variable(model_config.mu)
+    mu = tf.Variable(model_config.mu, dtype=tf.float32)
     F_x, F_y = create_gd_variables_tf(model_config.shot_no)
     return build_classical_iterative_model(model_config, mu * F_x, mu * F_y)
 

@@ -4,6 +4,9 @@ This package contains code to reproduce results for the machine learning based t
 First clone the repository to your machine, and create a virtual environment (and activate the venv).
 ```shell
 python -m venv venv
+
+(WINDOWS) venv\Scripts\activate{.bat, .ps1}
+(UNIX) source venv/bin/activate
 ```
 
 Then install the required packages, and the code of this project (or used the requirements-lock.txt):
@@ -57,12 +60,12 @@ tensorboard --logdir=logs/{model_id}/profile
     <img align="top" alt="Tensorboard profiler example" src="readme_files/tb_profile_example.png" width="49%"/>
 </p>
 
-[//]: # (We can get the same metrics for the SIRT algorithm as)
-
-[//]: # (```shell)
-
-[//]: # (python cli.py evaluate-sirt {?n_iterations} {?step_size})
-
-[//]: # (```)
-
+We can get the same metrics for the SIRT algorithm as
+```shell
+python cli.py evaluate-sirt {config_path}
+```
+A default configuration file for the sirt algorithm can be found in `configurations/base_sirt_config.yaml`, resulting in:
+```shell
+python cli.py evaluate-sirt configurations/base_sirt_config.yaml
+```
 

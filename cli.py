@@ -1,13 +1,15 @@
 from pathlib import Path
+from typing import Optional
 
 import typer
 
 import definitions
+from src.config.config import ModelConfig, DatasetConfig, Config
 from src.config.load import load_yaml_config_from_path
 from src.data.generate import generate_all_datasets
 from src.models.evaluate import evaluate_model_from_id
 from src.models.training import train_from_config
-
+from src.models.evaluate import evaluate_sirt_model
 app = typer.Typer()
 
 
@@ -40,12 +42,14 @@ def evaluate(model_id: str):
     evaluate_model_from_id(model_id)
 
 
-# WIP
-def evaluate_sirt(n_iterations: int = 100, mu: float = 2.0):
+@app.command()
+def evaluate_sirt(config_path: Path):
     """
-    Evaluate the SIRT algorithm for a set number of iterations and a certain step size mu.
+    Evaluate the SIRT algorithm for a certain configuration.yaml file. In this configuration file you can specify the number of iterations,
+    the step size (mu) and the dataset properties (like batch size).
     """
-    pass
+    config = load_yaml_config_from_path(config_path)
+    evaluate_sirt_model(config)
 
 
 if __name__ == "__main__":
