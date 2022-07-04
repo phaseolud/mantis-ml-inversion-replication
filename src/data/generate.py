@@ -132,7 +132,7 @@ def generate_random_lines(n_lines: int = 20, output_shape: Tuple[int, int] = (25
                 width=width,
             )
         if line_type == "uniform":
-            point0, point1 = create_random_points_uniform(output_shape)
+            point0, point1 = create_random_points_uniform(img_shape_extended)
 
             width = np.random.randint(1, 10)
             intensity = np.random.randint(0, 255)
