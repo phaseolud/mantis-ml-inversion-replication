@@ -14,7 +14,7 @@ def load_datasets(data_config: DatasetConfig) -> List[tf.data.Dataset]:
     """
 
     datasets = [
-        list_datasets(split, data_config.path)
+        list_datasets(split, data_config.full_path)
         for split in ["train", "test", "validation"]
     ]
 

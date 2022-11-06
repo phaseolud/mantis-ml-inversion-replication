@@ -84,10 +84,10 @@ def create_and_save_data_pair(
         f.write(f"{scaling_inv}")
 
 
-def generate_all_datasets(generate_dataset_fn, geometry_id: str, n_images_train: int = 1000):
-    generate_dataset_fn(n_images_train, geometry_id, "train")
-    generate_dataset_fn(int(0.2 * n_images_train), geometry_id, "test")
-    generate_dataset_fn(int(0.2 * n_images_train), geometry_id, "validation")
+def generate_all_datasets(geometry_id: str, n_images_train: int = 1000):
+    generate_dataset(n_images_train, geometry_id, "train")
+    generate_dataset(int(0.2 * n_images_train), geometry_id, "test")
+    generate_dataset(int(0.2 * n_images_train), geometry_id, "validation")
 
 
 def generate_random_lines(n_lines: int = 18, output_shape: Tuple[int, int] = (256, 256), crop_padding: int = 80,

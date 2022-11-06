@@ -17,7 +17,7 @@ def build_unfolded_proximal_learned_sirt_model(model_config: ModelConfig):
     Fy_square_grid_flat = BatchSparseDenseMatmul(tri_to_rect)(Fy)
 
     x_hat = tf.zeros_like(Fy_square_grid_flat)
-
+    intermediate_outputs = []
     for i in range(model_config.n_iterations):
         # model based sirt layer
         x_hat = SquareLSirtBlock(F_x, tri_to_rect, rect_to_tri, model_config.mu)(x_hat, Fy_square_grid_flat)
@@ -25,8 +25,13 @@ def build_unfolded_proximal_learned_sirt_model(model_config: ModelConfig):
         # learned proximal
         x_hat = proximal_operator_unet(model_config)(x_hat)
         x_hat = tfa.layers.InstanceNormalization()(x_hat)
+        intermediate_outputs.append(x_hat)
+        x_hat = tf.keras.layers.Flatten()(x_hat)
+
     outputs = tf.keras.layers.Reshape(model_config.output_shape_ext)(x_hat)
 
+    if model_config.unfolded_intermediate_output_loss:
+        outputs = [outputs] + intermediate_outputs
     return tf.keras.models.Model(inputs, outputs)
 
 
@@ -61,7 +66,6 @@ def proximal_operator_unet(model_config: ModelConfig):
                 (3, 3),
                 activation=model_config.final_activation_function,
                 padding="same",
-            ),
-            tf.keras.layers.Flatten(),
+            )
         ]
     )

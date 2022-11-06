@@ -15,3 +15,4 @@ setup(
 (Path().absolute() / "logs").mkdir(exist_ok=True)
 (Path().absolute() / "models").mkdir(exist_ok=True)
 (Path().absolute() / ".cache").mkdir(exist_ok=True)
+

@@ -7,7 +7,7 @@ from src.models.utils import sparse_scipy_matrix_to_tf, create_grid_transformati
 
 
 def build_classical_iterative_model(model_config: ModelConfig, F_x: tf.Tensor, F_y: tf.SparseTensor):
-    rect_to_tri, _ = create_grid_transformation_matrices_tf(model_config.geometry_id, model_config.output_shape)
+    _, tri_to_rect = create_grid_transformation_matrices_tf(model_config.geometry_id, model_config.output_shape)
     inputs = tf.keras.layers.Input(shape=model_config.input_shape + (1,))
     inputs_flat = tf.keras.layers.Flatten()(inputs)
 
@@ -16,7 +16,7 @@ def build_classical_iterative_model(model_config: ModelConfig, F_x: tf.Tensor, F
 
     outputs_flat = iterative_solver_tf(F_x, Fy, x_hat, model_config.n_iterations)
     outputs = tf.keras.layers.Reshape(model_config.output_shape + (1,))(
-        BatchSparseDenseMatmul(rect_to_tri)(outputs_flat)
+        BatchSparseDenseMatmul(tri_to_rect)(outputs_flat)
     )
 
     model = tf.keras.models.Model(inputs, outputs)

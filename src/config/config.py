@@ -15,10 +15,11 @@ class DatasetConfig(BaseConfigModel):
     batch_size: int = 32
     output_rect_grid_shape: Tuple[int, int] = (256, 256)
     mask_unobservable_output: bool = True
-
+    noise: dict = {}
+    copy_input_to_output: bool = False
     @property
     def path(self) -> Path:
-        return Path("processed") / "mantis" / self.geometry_id
+        return Path("processed") / self.geometry_id
 
     @property
     def full_path(self) -> Path:
@@ -37,6 +38,7 @@ class ModelConfig(BaseConfigModel):
     final_activation_function: str = "relu"
 
     mu: float = 1.99
+    unfolded_intermediate_output_loss: bool = False
     n_iterations: Optional[int] = None
     input_shape: Tuple[int, int] = None
     output_shape: Tuple[int, int] = None

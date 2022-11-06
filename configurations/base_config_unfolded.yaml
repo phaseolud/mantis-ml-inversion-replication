@@ -4,6 +4,7 @@ model:
   decoder_filters: [ 32, 16, 8, 8 ]
   encoder_filters: [ 8, 8, 16, 32 ]
   bottleneck_filters: [ 32 ]
+  unfolded_intermediate_output_loss: True
   n_iterations: 5
 dataset:
   geometry_id: 65903_cam_10
