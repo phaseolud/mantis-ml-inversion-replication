@@ -15,13 +15,13 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-To get started with this project you need two additional data files: the inversion grid and a geometry matrix.
-Copy the inversion grid file to `./data/utils/inversion_grid.mat` and copy the geometry matrix for a specific shot to `./data/utils/geometry_matrices/{shot_no}.npz`.
+To get started with this project you need one additional data file: the geometry matrix.
+Copy the geometry matrix for a specific shot to `./data/utils/geometry_matrices/{geometry_id}.npz`.
 
 Now you can run the tutorials in the `notebooks` directory, or use the command line interface.
 To get started with the command line interface generate some data with:
 ```shell
-python cli.py generate-dataset {shot_no} {number_of_training_samples}
+python cli.py generate-dataset {geometry_id} {number_of_training_samples}
 ```
 
 Then you can edit the `config.yaml` file as you wish, but the default one in the repository should work as well.
@@ -34,7 +34,7 @@ or when using a different configuration file use (with ? indicating an optional 
 python cli.py train {?your_configuration_file.yaml}
 ```
 
-You can find the inversion grid and the geometry matrix for shot number 65903 on [this google drive](https://drive.google.com/drive/folders/1hxuSuCPjPOhwNOfia9q8m1M7VJkKuTa1?usp=sharing).
+You can find a geometry matrix for shot number 65903 on [this google drive](https://drive.google.com/drive/folders/1hxuSuCPjPOhwNOfia9q8m1M7VJkKuTa1?usp=sharing).
 
 
 ## Reproduction
