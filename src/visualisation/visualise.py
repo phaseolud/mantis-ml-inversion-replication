@@ -1,12 +1,14 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-from src.data.utils import load_inversion_grid, create_grid_transformation_matrices
+
+from src.data.grid import load_tri_grid
+from src.data.utils import create_grid_transformation_matrices
 
 
-def plot_poloidal(poloidal_crosssection: np.array, ax=None, **kwargs):
+def plot_poloidal(poloidal_crosssection: np.array, ax=None, geometry_id: str = "65903_cam_10", **kwargs):
     ax = ax or plt.gca()
-    inversion_grid = load_inversion_grid()
+    inversion_grid = load_tri_grid(geometry_id)
     tri_grid = mpl.tri.Triangulation(
         inversion_grid["tri_x"][0][0][0],
         inversion_grid["tri_y"][0][0][0],

@@ -7,12 +7,13 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import numpy as np
 import definitions
-from src.data.utils import load_geometry_matrix, create_grid_transformation_matrices
+from src.data.utils import load_geometry_matrix
+from src.data.grid import create_grid_transformation_matrices
 
 
-def generate_dataset(n_images: int, shot_no: int, subset: str, output_grid_shape: Tuple[int, int] = (256, 256)):
+def generate_dataset(n_images: int, geometry_id: str, subset: str, output_grid_shape: Tuple[int, int] = (256, 256)):
     data_path = (
-                definitions.DATA_DIR / "processed" / "MANTIS" / str(shot_no)
+                definitions.DATA_DIR / "processed" / geometry_id
                 ) / subset
 
     if not data_path.exists():
@@ -28,20 +29,20 @@ def generate_dataset(n_images: int, shot_no: int, subset: str, output_grid_shape
         )
 
     images_i_list = tqdm(range(start_id, n_images + start_id))
-    geometry_matrix = load_geometry_matrix(shot_no)
+    geometry_matrix = load_geometry_matrix(geometry_id)
 
-    tri_to_square_grid_mat, square_to_tri_grid_mat = create_grid_transformation_matrices(output_grid_shape)
+    rect_to_tri, tri_to_rect = create_grid_transformation_matrices(geometry_id, output_grid_shape)
 
     # maximum of 16 cores because of a small bottleneck on the marconi cluster
-    num_cores = min(multiprocessing.cpu_count(), 16)
+    num_cores = min(multiprocessing.cpu_count() - 1, 16)
     Parallel(n_jobs=num_cores)(
         delayed(create_and_save_data_pair)(
             i,
             data_path,
             geometry_matrix,
             output_grid_shape,
-            tri_to_square_grid_mat,
-            square_to_tri_grid_mat,
+            tri_to_rect,
+            rect_to_tri,
         )
         for i in images_i_list
     )
@@ -52,49 +53,45 @@ def create_and_save_data_pair(
     data_path,
     geometry_matrix,
     output_grid_shape,
-    tri_to_square_grid_mat,
-    square_to_tri_grid_mat,
+    tri_to_rect_mat,
+    rect_to_tri_mat,
 ):
     Path.mkdir(data_path / str(i))
 
     random_lines = generate_random_lines()
-    poloidal_crosssection = square_to_tri_grid_mat @ random_lines.reshape(-1)
+    poloidal_crosssection = rect_to_tri_mat @ random_lines.reshape(-1)
     forward_modelled = geometry_matrix @ poloidal_crosssection
 
     # because in an image we only have 8 bits of information, we would like to use it all
-    scaling_fw = 255 / max(forward_modelled.max(), 1e-2)
+    scaling_fw = (2 ** 16 - 1) / max(forward_modelled.max(), 1e-2)
 
-    fw_modelled_scaled = (forward_modelled * scaling_fw).astype(np.uint8)
+    fw_modelled_scaled = (forward_modelled * scaling_fw).astype(np.uint16)
     fw_modelled_reshaped = fw_modelled_scaled.reshape((1032, -1))
 
     fw_image = Image.fromarray(fw_modelled_reshaped)
-    fw_image.save(data_path / str(i) / "cam_img.png")
+    fw_image.save(data_path / str(i) / "cam_img.png", bits=16)
 
     with open(data_path / str(i) / "scaling_cam.txt", "w") as f:
         f.write(f"{scaling_fw}")
 
-    scaling_inv = 255 / max(poloidal_crosssection.max(), 1e-2)
-    inversion_square_grid = tri_to_square_grid_mat @ poloidal_crosssection
-    inversion_square_grid_scaled = (inversion_square_grid * scaling_inv).astype(
-        np.uint8
-    )
-    inversion_image = Image.fromarray(
-        inversion_square_grid_scaled.reshape(output_grid_shape)
-    )
-    inversion_image.save(data_path / str(i) / "inversion.png")
+    scaling_inv = (2 ** 16 - 1) / max(poloidal_crosssection.max(), 1e-2)
+    inversion_square_grid = tri_to_rect_mat @ poloidal_crosssection
+    inversion_square_grid_scaled = (inversion_square_grid * scaling_inv).astype(np.uint16)
+    inversion_image = Image.fromarray(inversion_square_grid_scaled.reshape(output_grid_shape))
+    inversion_image.save(data_path / str(i) / "inversion.png", bits=16)
 
     with open(data_path / str(i) / "scaling_inv.txt", "w") as f:
         f.write(f"{scaling_inv}")
 
 
-def generate_all_datasets(shot_no: int, n_images_train: int):
-    generate_dataset(n_images_train, shot_no, "train")
-    generate_dataset(int(0.2 * n_images_train), shot_no, "test")
-    generate_dataset(int(0.2 * n_images_train), shot_no, "validation")
+def generate_all_datasets(generate_dataset_fn, geometry_id: str, n_images_train: int = 1000):
+    generate_dataset_fn(n_images_train, geometry_id, "train")
+    generate_dataset_fn(int(0.2 * n_images_train), geometry_id, "test")
+    generate_dataset_fn(int(0.2 * n_images_train), geometry_id, "validation")
 
 
-def generate_random_lines(n_lines: int = 20, output_shape: Tuple[int, int] = (256, 256), crop_padding: int = 80,
-                          line_type_probs: Tuple[float, float, float] = (1/3, 1/3, 1/3)):
+def generate_random_lines(n_lines: int = 18, output_shape: Tuple[int, int] = (256, 256), crop_padding: int = 80,
+                          line_type_probs: Tuple[float, float, float] = (0.5, 0.2, 0.3)):
     (img_height, img_width) = output_shape
     img_shape_extended = (img_height + crop_padding, img_width + crop_padding)
     img = Image.new("L", (img_width + crop_padding, img_height + crop_padding))
@@ -181,8 +178,8 @@ def create_gradient_img(
     return img
 
 
-def create_random_points_uniform(output_shape: Tuple[int, int]):
-    img_height, img_width = output_shape
+def create_random_points_uniform(img_shape):
+    img_height, img_width = img_shape
     max_shape = max(img_height, img_width)
 
     x1, x2, x3 = np.random.uniform(0, 1, size=3)

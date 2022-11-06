@@ -1,11 +1,11 @@
 model:
   name: unet sirt
-  shot_no: 65903
+  geometry_id: 65903_cam_10
   encoder_filters: [ 64, 64, 64, 128, 128, 128]
   decoder_filters: [ 64, 32, 32, 16, 16, 16]
   bottleneck_filters: [ 64 ]
 dataset:
-  shot_no: 65903
+  geometry_id: 65903_cam_10
   batch_size: 16
 training:
   epochs: 80

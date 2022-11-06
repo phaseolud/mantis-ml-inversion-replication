@@ -4,7 +4,6 @@ from scipy.sparse import diags
 from src.config.config import ModelConfig
 from src.data.utils import load_geometry_matrix
 from src.models.utils import sparse_scipy_matrix_to_tf, create_grid_transformation_matrices_tf, BatchSparseDenseMatmul
-from src.utils import disk_memory
 
 
 def build_classical_iterative_model(model_config: ModelConfig, F_x: tf.Tensor, F_y: tf.SparseTensor):
@@ -26,13 +25,13 @@ def build_classical_iterative_model(model_config: ModelConfig, F_x: tf.Tensor, F
 
 def build_sirt_model(model_config: ModelConfig):
     mu = tf.Variable(model_config.mu, dtype=tf.float32)
-    F_x, F_y = create_sirt_variables_tf(model_config.shot_no)
+    F_x, F_y = create_sirt_variables_tf(model_config.geometry_id)
     return build_classical_iterative_model(model_config, mu * F_x, mu * F_y)
 
 
 def build_gd_model(model_config: ModelConfig):
     mu = tf.Variable(model_config.mu, dtype=tf.float32)
-    F_x, F_y = create_gd_variables_tf(model_config.shot_no)
+    F_x, F_y = create_gd_variables_tf(model_config.geometry_id)
     return build_classical_iterative_model(model_config, mu * F_x, mu * F_y)
 
 
@@ -55,20 +54,20 @@ def iterative_solver_tf(F_x: tf.Tensor, Fy: tf.Tensor, x_hat: tf.Tensor, n_itera
     return x_hat
 
 
-def create_sirt_variables_tf(shot_no: int):
+def create_sirt_variables_tf(geometry_id: str):
     """
     Calculates the solution estimate operator and the back projection operator for the SIRT algorithm for a specific
     geometry matrix (shot_number). The operators are transformed to tf.Tensor types. We use a separate function for the
     tf variables, because loading from disk_cache resulted in problems before for tf variables.
     :returns: F_x = C G^T R G (dense),  F_y = C G^T R (sparse)
     """
-    F_x_np, F_y_np = create_sirt_variables(shot_no)
+    F_x_np, F_y_np = create_sirt_variables(geometry_id)
     F_y = sparse_scipy_matrix_to_tf(F_y_np)
     F_x = tf.constant(F_x_np)
     return F_x, F_y
 
 
-def create_gd_variables_tf(shot_no: int):
+def create_gd_variables_tf(geometry_id: str):
     """
     Calculates the solution estimate operator and the back projection operator for the gradient descent algorithm for
     a specific geometry matrix (shot_number). The operators are transformed to tf.Tensor types. We use a separate
@@ -76,21 +75,20 @@ def create_gd_variables_tf(shot_no: int):
 
     :returns: F_x = G^T G (dense),  F_y = G^T (sparse)
     """
-    F_x_np, F_y_np = create_gd_variables(shot_no)
+    F_x_np, F_y_np = create_gd_variables(geometry_id)
     F_x = tf.constant(F_x_np)
     F_y = sparse_scipy_matrix_to_tf(F_y_np)
     return F_x, F_y
 
 
-@disk_memory.cache
-def create_sirt_variables(shot_no: int):
+def create_sirt_variables(geometry_id: str):
     """
     Calculates the solution estimate operator and the back projection operator for the SIRT algorithm for a specific
     geometry matrix (shot_number).
 
     :returns: F_x = C G^T R G (dense),  F_y = C G^T R (sparse)
     """
-    geometry_matrix = load_geometry_matrix(shot_no)
+    geometry_matrix = load_geometry_matrix(geometry_id)
 
     # The geometry matrix can contain full zero rows/columns, so ignore the divide by zero, and remove the nan-values
     with np.errstate(divide='ignore'):
@@ -102,14 +100,13 @@ def create_sirt_variables(shot_no: int):
     return F_x, F_y
 
 
-@disk_memory.cache
-def create_gd_variables(shot_no: int):
+def create_gd_variables(geometry_id: str):
     """
     Calculates the solution estimate operator and the back projection operator for the gradient descent algorithm for
     a specific geometry matrix (shot_number).
     :returns: F_x = G^T G (dense),  F_y = G^T (sparse)
     """
-    geometry_matrix = load_geometry_matrix(shot_no)
+    geometry_matrix = load_geometry_matrix(geometry_id)
     F_x = (geometry_matrix.transpose() @ geometry_matrix).todense().A
     F_y = geometry_matrix.transpose()
 

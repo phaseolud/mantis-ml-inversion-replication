@@ -40,8 +40,8 @@ def sparse_scipy_matrix_to_tf(sparse_matrix):
     )
 
 
-def load_geometry_matrix_tf(shot_no: int):
-    geometry_matrix = load_geometry_matrix(shot_no)
+def load_geometry_matrix_tf(geometry_id: str):
+    geometry_matrix = load_geometry_matrix(geometry_id)
     return sparse_scipy_matrix_to_tf(geometry_matrix)
 
 

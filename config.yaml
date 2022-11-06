@@ -1,8 +1,8 @@
 model:
   name: unet sirt
-  shot_no: 65903
+  geometry_id: 65903_cam_10
 dataset:
-  shot_no: 65903
+  geometry_id: 65903_cam_10
   batch_size: 2
 training:
   epochs: 1

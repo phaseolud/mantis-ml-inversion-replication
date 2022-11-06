@@ -1,6 +1,8 @@
 jupyter
 matplotlib
-tensorflow
+tensorflow ; sys_platform != 'darwin'
+tensorflow-macos ; sys_platform == 'darwin'
+tensorflow-metal ; sys_platform == 'darwin'
 tensorboard
 tensorflow_addons
 joblib
@@ -11,3 +13,4 @@ typer
 pyyaml
 pydantic
 tqdm
+pillow
