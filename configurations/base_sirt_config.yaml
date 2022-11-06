@@ -1,8 +1,8 @@
 model:
   name: sirt
-  shot_no: 65903
+  geometry_id: 65903_cam_10
   n_iterations: 100
   step_size: 2.
 dataset:
-  shot_no: 65903
+  geometry_id: 65903_cam_10
   batch_size: 1

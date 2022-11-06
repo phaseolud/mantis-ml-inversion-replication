@@ -3,7 +3,8 @@ from typing import Tuple
 import numpy as np
 import tensorflow as tf
 
-from src.data.utils import load_geometry_matrix, create_grid_transformation_matrices
+from src.data.grid import create_grid_transformation_matrices
+from src.data.utils import load_geometry_matrix
 
 
 class BatchSparseDenseMatmul(tf.keras.layers.Layer):
@@ -45,15 +46,15 @@ def load_geometry_matrix_tf(geometry_id: str):
     return sparse_scipy_matrix_to_tf(geometry_matrix)
 
 
-def create_grid_transformation_matrices_tf(output_grid_shape: Tuple[int, int]) -> Tuple[tf.SparseTensor, tf.SparseTensor]:
+def create_grid_transformation_matrices_tf(geometry_id: str, output_grid_shape: Tuple[int, int]) -> Tuple[tf.SparseTensor, tf.SparseTensor]:
     """
     Calculates the transformation matrices: square grid <--> triangular inversion grid by minimizing the
     distance between the individual points in both grids. The returned matrices are sparse TF tensors.
 
-    :returns: tri_to_square_grid_mat, square_to_inv_grid_mat
+    :returns: rect_to_tri_tf, tri_to_rect_tf
     """
-    tri_to_square_grid, square_to_tri_grid = create_grid_transformation_matrices(output_grid_shape)
-    tri_to_square_grid_tf = sparse_scipy_matrix_to_tf(tri_to_square_grid)
-    square_to_tri_grid_tf = sparse_scipy_matrix_to_tf(square_to_tri_grid)
+    rect_to_tri, tri_to_rect = create_grid_transformation_matrices(geometry_id, output_grid_shape)
+    tri_to_rect_tf = sparse_scipy_matrix_to_tf(tri_to_rect)
+    rect_to_tri_tf = sparse_scipy_matrix_to_tf(rect_to_tri)
 
-    return tri_to_square_grid_tf, square_to_tri_grid_tf
+    return rect_to_tri_tf, tri_to_rect_tf

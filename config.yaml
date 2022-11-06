@@ -1,5 +1,5 @@
 model:
-  name: unet sirt
+  name: unet_backprojection
   geometry_id: 65903_cam_10
 dataset:
   geometry_id: 65903_cam_10

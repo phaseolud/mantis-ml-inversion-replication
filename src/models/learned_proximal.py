@@ -10,17 +10,17 @@ def build_unfolded_proximal_learned_sirt_model(model_config: ModelConfig):
     inputs = tf.keras.layers.Input(model_config.input_shape_ext)
     inputs_flat = tf.keras.layers.Flatten()(inputs)
 
-    F_x, F_y = create_sirt_variables_tf(model_config.shot_no)
-    tri_to_square_grid, square_to_tri_grid = create_grid_transformation_matrices_tf(model_config.output_shape)
+    F_x, F_y = create_sirt_variables_tf(model_config.geometry_id)
+    rect_to_tri, tri_to_rect = create_grid_transformation_matrices_tf(model_config.geometry_id, model_config.output_shape)
 
     Fy = BatchSparseDenseMatmul(F_y)(inputs_flat)
-    Fy_square_grid_flat = BatchSparseDenseMatmul(tri_to_square_grid)(Fy)
+    Fy_square_grid_flat = BatchSparseDenseMatmul(tri_to_rect)(Fy)
 
     x_hat = tf.zeros_like(Fy_square_grid_flat)
 
     for i in range(model_config.n_iterations):
         # model based sirt layer
-        x_hat = SquareLSirtBlock(F_x, tri_to_square_grid, square_to_tri_grid, model_config.mu)(x_hat, Fy_square_grid_flat)
+        x_hat = SquareLSirtBlock(F_x, tri_to_rect, rect_to_tri, model_config.mu)(x_hat, Fy_square_grid_flat)
 
         # learned proximal
         x_hat = proximal_operator_unet(model_config)(x_hat)
@@ -49,7 +49,7 @@ class SquareLSirtBlock(tf.keras.layers.Layer):
 def proximal_operator_unet(model_config: ModelConfig):
     return tf.keras.Sequential(
         [
-            tf.keras.layers.Reshape((256, 256, 1)),
+            tf.keras.layers.Reshape(model_config.output_shape_ext),
             UnetBase(
                 model_config.encoder_filters,
                 model_config.decoder_filters,

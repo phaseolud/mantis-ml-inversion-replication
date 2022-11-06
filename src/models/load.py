@@ -5,12 +5,11 @@ from src.models.learned_proximal import build_unfolded_proximal_learned_sirt_mod
 from src.models.unet import build_sirt_informed_unet_model
 
 model_map = {
-    "gradient descent": build_gd_model,
+    "gradient_descent": build_gd_model,
     "sirt": build_sirt_model,
-    "unet sirt": build_sirt_informed_unet_model,
-    "unfolded proximal sirt": build_unfolded_proximal_learned_sirt_model
+    "unet_backprojection": build_sirt_informed_unet_model,
+    "deep_unfolded_proximal_sirt": build_unfolded_proximal_learned_sirt_model
 }
-
 
 def load_model(model_config: ModelConfig) -> tf.keras.models.Model:
     if model_config.name not in model_map.keys():

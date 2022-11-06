@@ -13,11 +13,11 @@ def build_sirt_informed_unet_model(model_config: ModelConfig):
     inputs_flat = tf.keras.layers.Flatten()(inputs)
 
     # back project measured image
-    _, F_y = create_sirt_variables_tf(model_config.shot_no)
-    tri_to_square_grid, _ = create_grid_transformation_matrices_tf(model_config.output_shape)
+    _, F_y = create_sirt_variables_tf(model_config.geometry_id)
+    _, tri_to_rect = create_grid_transformation_matrices_tf(model_config.geometry_id, model_config.output_shape)
 
     Fy = BatchSparseDenseMatmul(F_y)(inputs_flat)
-    Fy_square_grid_flat = BatchSparseDenseMatmul(tri_to_square_grid)(Fy)
+    Fy_square_grid_flat = BatchSparseDenseMatmul(tri_to_rect)(Fy)
     Fy_square = tf.keras.layers.Reshape(model_config.output_shape + (1,))(Fy_square_grid_flat)
 
     unet_outputs = UnetBase(model_config.encoder_filters, model_config.decoder_filters,
