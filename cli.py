@@ -25,12 +25,12 @@ def train(config_filepath: Path = definitions.ROOT_DIR / "config.yaml"):
 
 
 @app.command()
-def generate_dataset(shot_no: int, count: int):
+def generate_dataset(geometry_id: str, count: int):
     """
     Generate a synthetic dataset to train the networks on. The shot_no is used to determine which geometry matrix to use, and count defines
     the number of training samples to create. The number of validation and test samples are 20% of the number of training samples.
     """
-    generate_all_datasets(shot_no, count)
+    generate_all_datasets(geometry_id, count)
 
 
 @app.command()
