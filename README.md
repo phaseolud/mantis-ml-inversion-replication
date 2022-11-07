@@ -37,7 +37,7 @@ python cli.py train {?your_configuration_file.yaml}
 You can find a geometry matrix for shot number 65903 on [this google drive](https://drive.google.com/drive/folders/1hxuSuCPjPOhwNOfia9q8m1M7VJkKuTa1?usp=sharing).
 
 
-## Reproduction
+## Evaluation
 The code in this repository is very similar to the code used to generate the figures and results in the halfway paper.
 Configurations that should yield similar results for both the informed U-net and the deep unfolded network can both be found in the
 `configurations` directory. 25000 training samples had been generated for the training.
