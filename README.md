@@ -9,7 +9,7 @@ python -m venv venv
 (UNIX) source venv/bin/activate
 ```
 
-Then install the required packages, and the code of this project (or used the requirements-lock.txt):
+Then install the required packages, and the code of this project (or use the requirements-lock.txt):
 ```shell
 pip install -r requirements.txt
 pip install -e .

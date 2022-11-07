@@ -18,6 +18,7 @@ def train(config_filepath: Path = definitions.ROOT_DIR / "config.yaml"):
     """
     Train a neural network to estimate the tomographic reconstruction. The used dataset, model and other configurations are defined in
     config.yaml. You can find more information about the default configuration in src/config/config.py.
+
     :param config_filepath: The configuration file (yaml) which determines the (hyper)parameters used for training
     """
     config = load_yaml_config_from_path(config_filepath)

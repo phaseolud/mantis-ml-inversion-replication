@@ -9,7 +9,7 @@ joblib
 numpy
 tensorboard_plugin_profile
 scipy
-typer
+typer[all]
 pyyaml
 pydantic
 tqdm
